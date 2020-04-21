@@ -66,6 +66,8 @@ namespace NUIWHome
                 //Icon init:opacity 0, for starting animation
                 item.Opacity = 0.0f;
                 rotarySelector.AppendItem(item);
+                if (i == 13)
+                    break;
             }
             defaultWindow.Add(rotarySelector);
 
@@ -75,6 +77,7 @@ namespace NUIWHome
         {
             RotarySelectorItem item = sender as RotarySelectorItem;
             Tizen.Log.Error("MYLOG", "clicked item text :" + item.MainText);
+            rotarySelector.DeleteItem(item);
         }
 
         private void Item_Selected(object sender, EventArgs e)
@@ -99,6 +102,10 @@ namespace NUIWHome
                     String FullFileName = File.FullName;
 
                     imageFileList.Add(new CommonResource.ResourceData(FileNameOnly, FullFileName));
+                    if (imageFileList.Count >= 13)
+                    {
+                        break;
+                    }
                 }
             }
             imageFileList.Sort(delegate (CommonResource.ResourceData A, CommonResource.ResourceData B)
