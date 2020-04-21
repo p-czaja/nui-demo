@@ -14,6 +14,7 @@ namespace NUIWHome
 
         private RotarySelector rotarySelector;
         private Window defaultWindow;
+        List<CommonResource.ResourceData> imageFileList;
 
 
         protected override void OnCreate()
@@ -51,7 +52,7 @@ namespace NUIWHome
                 BackgroundColor = Color.Black,
             };
 
-            List<CommonResource.ResourceData> imageFileList = SaveImageIconList();
+            imageFileList = SaveImageIconList();
             for (int i = 0; i < imageFileList.Count; i++)
             {
                 RotarySelectorItem item = new RotarySelectorItem()
@@ -66,6 +67,8 @@ namespace NUIWHome
                 //Icon init:opacity 0, for starting animation
                 item.Opacity = 0.0f;
                 rotarySelector.AppendItem(item);
+                if (i == 13)
+                    break;
             }
             defaultWindow.Add(rotarySelector);
 
@@ -73,8 +76,22 @@ namespace NUIWHome
 
         private void Item_Clicked(object sender, EventArgs e)
         {
-            RotarySelectorItem item = sender as RotarySelectorItem;
-            Tizen.Log.Error("MYLOG", "clicked item text :" + item.MainText);
+            RotarySelectorItem itemclicked = sender as RotarySelectorItem;
+            Tizen.Log.Error("MYLOG", "clicked item text :" + itemclicked.MainText);
+
+            RotarySelectorItem item = new RotarySelectorItem()
+            {
+                ResourceUrl = imageFileList[14].path,
+                Size = new Size(ICON_SIZE, ICON_SIZE),
+                CornerRadius = ICON_SIZE / 2,
+                MainText = imageFileList[14].name,
+            };
+            item.Clicked += Item_Clicked;
+            item.Selected += Item_Selected;
+            //Icon init:opacity 0, for starting animation
+            item.Opacity = 0.0f;
+            rotarySelector.AppendItem(item);
+
         }
 
         private void Item_Selected(object sender, EventArgs e)
@@ -99,6 +116,10 @@ namespace NUIWHome
                     String FullFileName = File.FullName;
 
                     imageFileList.Add(new CommonResource.ResourceData(FileNameOnly, FullFileName));
+                    if (imageFileList.Count >= 13)
+                    {
+                        break;
+                    }
                 }
             }
             imageFileList.Sort(delegate (CommonResource.ResourceData A, CommonResource.ResourceData B)
