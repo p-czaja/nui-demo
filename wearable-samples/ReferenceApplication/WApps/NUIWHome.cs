@@ -53,7 +53,7 @@ namespace NUIWHome
             };
 
             List<CommonResource.ResourceData> imageFileList = SaveImageIconList();
-            for (int i = 0; i < imageFileList.Count; i++)
+            for (int i = 0; i < 11; i++)
             {
                 RotarySelectorItem item = new RotarySelectorItem()
                 {
@@ -64,12 +64,40 @@ namespace NUIWHome
                 };
                 item.Clicked += Item_Clicked;
                 item.Selected += Item_Selected;
+                item.Deleted += Item_Deleted;
+                item.Reordered += Item_Reordered;
                 //Icon init:opacity 0, for starting animation
                 item.Opacity = 0.0f;
                 rotarySelector.AppendItem(item);
             }
             defaultWindow.Add(rotarySelector);
 
+        }
+
+        private void Item_Reordered(object sender, RotarySelectorItem.ReoderEventArgs e)
+        {
+            RotarySelectorItem item = sender as RotarySelectorItem;
+            Tizen.Log.Error("MYLOG", $"reordered item text : {item.MainText} {e.PreIndex} -> {e.CurrentIndex}" );
+        }
+
+        private void Item_Deleted(object sender, EventArgs e)
+        {
+            RotarySelectorItem item = sender as RotarySelectorItem;
+            Tizen.Log.Error("MYLOG", "deleted item text :" + item.MainText);
+
+            RotarySelectorItem itemToAdd = new RotarySelectorItem()
+            {
+                ResourceUrl = item.ResourceUrl,
+                Size = new Size(ICON_SIZE, ICON_SIZE),
+                CornerRadius = ICON_SIZE / 2,
+                MainText = item.MainText,
+            };
+            itemToAdd.Clicked += Item_Clicked;
+            itemToAdd.Selected += Item_Selected;
+            itemToAdd.Deleted += Item_Deleted;
+            //Icon init:opacity 0, for starting animation
+            itemToAdd.Opacity = 0.0f;
+            rotarySelector.AppendItem(itemToAdd);
         }
 
         private void Item_Clicked(object sender, EventArgs e)
