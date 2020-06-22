@@ -26,7 +26,7 @@ namespace NUIWHome
         {
             defaultWindow = GetDefaultWindow();
             defaultWindow.BackgroundColor = Color.White;
-            defaultWindow.KeyEvent += DefaultWindow_KeyEvent;
+            //defaultWindow.KeyEvent += DefaultWindow_KeyEvent;
 
             InitializeDefaultUI();
 
@@ -50,10 +50,14 @@ namespace NUIWHome
             {
                 Size2D = defaultWindow.WindowSize,
                 BackgroundColor = Color.Black,
+                Focusable = true
             };
+            rotarySelector.FocusLost += RotarySelector_FocusLost;
+            rotarySelector.FocusGained += RotarySelector_FocusGained;
+            rotarySelector.KeyEvent += RotarySelector_KeyEvent;
 
             List<CommonResource.ResourceData> imageFileList = SaveImageIconList();
-            for (int i = 0; i < imageFileList.Count; i++)
+            for (int i = 0; i < 15; i++)
             {
                 RotarySelectorItem item = new RotarySelectorItem()
                 {
@@ -69,7 +73,35 @@ namespace NUIWHome
                 rotarySelector.AppendItem(item);
             }
             defaultWindow.Add(rotarySelector);
+            FocusManager.Instance.SetCurrentFocusView(rotarySelector);
+        }
 
+        private bool RotarySelector_KeyEvent(object source, View.KeyEventArgs e)
+        {
+            if (e.Key.State == Key.StateType.Up && (e.Key.KeyPressedName == "XF86Back"))
+            {
+                if (rotarySelector.GetCurrentMode() == RotarySelector.Mode.EditMode)
+                {
+                    rotarySelector.SetNormalMode();
+                }
+                else
+                {
+                    Exit();
+                }
+            }
+
+            return true;
+        }
+
+        private void RotarySelector_FocusGained(object sender, EventArgs e)
+        {
+            Tizen.Log.Error("MYLOG", "Rotary Selector focus gained");
+        }
+
+        private void RotarySelector_FocusLost(object sender, EventArgs e)
+        {
+            Tizen.Log.Error("MYLOG", "Rotary Selector focus lost");
+            FocusManager.Instance.SetCurrentFocusView(rotarySelector);
         }
 
         private void Item_Clicked(object sender, EventArgs e)
