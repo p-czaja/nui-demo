@@ -78,6 +78,25 @@ namespace NUIWHome
             stateAnimation.Play();
         }
 
+        internal void AnimateItemSelected(RotarySelectorItem item)
+        {
+            AnimateItem(item, 1.17f);
+        }
+
+        internal void AnimateItemUnselected(RotarySelectorItem item)
+        {
+            AnimateItem(item, 1.0f);
+        }
+
+        private static void AnimateItem(RotarySelectorItem item, float scale)
+        {
+            Animation animation = new Animation();
+            animation.Duration = 350;
+
+            animation.AnimateTo(item, "Scale", new Vector3(scale, scale, scale));
+            animation.Play();
+        }
+
         internal void AnimateStarting(RotaryLayerView layer, List<RotaryItemWrapper> wrapperList)
         {
             animationCore.Duration = 350;
@@ -85,21 +104,6 @@ namespace NUIWHome
 
             RotaryIndicator indicator = layer.GetIndicator();
             TextLabel mainText = layer.GetMainText();
-
-            //Init value -> Animate position from 131(radius) to default value
-            indicator.Position = indicator.GetRotaryPosition(indicator.CurrentIndex + 1, 131);
-            indicator.Opacity = 0.0f;
-
-            mainText.Opacity = 0.0f;
-            mainText.Scale = new Vector3(1.2f, 1.2f, 1.2f);
-            mainText.Text = wrapperList[0].RotaryItem.MainText;
-
-            //Add animation
-            animationCore.AnimateTo(indicator, "Position", indicator.GetRotaryPosition(indicator.CurrentIndex + 1), alphaSineInOut80);
-            animationCore.AnimateTo(indicator, "Opacity", 1.0f, alphaSineInOut80);
-
-            animationCore.AnimateTo(mainText, "Scale", new Vector3(1.0f, 1.0f, 1.0f), alphaSineInOut80);
-            animationCore.AnimateTo(mainText, "Opacity", 1.0f, alphaSineInOut80);
 
             // Second Page -> hide
             for (int i = 0; i < wrapperList.Count; i++)
@@ -112,8 +116,27 @@ namespace NUIWHome
 
                     animationCore.AnimateTo(item, "Position", wrapperList[i].GetRotaryPosition(wrapperList[i].CurrentIndex + 1, true, 139), alphaSineInOut80);
                     animationCore.AnimateTo(item, "Opacity", 1.0f, alphaSineInOut80);
+                    if (item.IsSelected)
+                    {
+                        mainText.Text = item.MainText;
+                        animationCore.AnimateTo(item, "Scale", new Vector3(1.17f, 1.17f, 1.17f));
+                    }
                 }
             }
+
+            //Init value -> Animate position from 131(radius) to default value
+            indicator.Position = indicator.GetRotaryPosition(indicator.CurrentIndex + 1, 131);
+            indicator.Opacity = 0.0f;
+
+            mainText.Opacity = 0.0f;
+            mainText.Scale = new Vector3(1.2f, 1.2f, 1.2f);
+
+            //Add animation
+            animationCore.AnimateTo(indicator, "Position", indicator.GetRotaryPosition(indicator.CurrentIndex + 1), alphaSineInOut80);
+            animationCore.AnimateTo(indicator, "Opacity", 1.0f, alphaSineInOut80);
+
+            animationCore.AnimateTo(mainText, "Scale", new Vector3(1.0f, 1.0f, 1.0f), alphaSineInOut80);
+            animationCore.AnimateTo(mainText, "Opacity", 1.0f, alphaSineInOut80);
 
             animationCore.Play();
         }
@@ -147,7 +170,7 @@ namespace NUIWHome
             {
                 int sTime = isReverse ? mAniUtil.GetStartTime(wrapperIndex) : 240 - mAniUtil.GetStartTime(wrapperIndex);
 
-                Position pos = wrapper.GetRotaryPosition(wrapperIndex + 1);
+                Position pos = rotaryItem.Position;
 
                 rotaryItem.Position = new Position(pos.X + (isReverse ? 70 : -70), pos.Y); ;
 
@@ -172,7 +195,7 @@ namespace NUIWHome
 
             if (type == PageAnimationType.Slide)
             {
-                Position pos = wrapper.GetRotaryPosition(wrapper.CurrentIndex + 1);
+                Position pos = rotaryItem.Position;
                 Position movePos = new Position(pos.X + (isReverse ? -70 : 70), pos.Y);
 
                 animationCore.AnimateTo(rotaryItem, "Position", movePos, 0, 250, alphaGlideOut);

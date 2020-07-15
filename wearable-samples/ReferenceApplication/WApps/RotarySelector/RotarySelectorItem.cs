@@ -39,6 +39,8 @@ namespace NUIWHome
         private RotaryBadege deleteBadge;
         public bool IsDeleteAble { get; set; }
 
+        internal bool IsSelected { get; set; }
+
         /// <summary>
         /// Creates a new instance of a RotarySelectorItem.
         /// </summary>
@@ -47,6 +49,7 @@ namespace NUIWHome
             PivotPoint = Tizen.NUI.PivotPoint.Center;
             PositionUsesPivotPoint = true;
             IsDeleteAble = true;
+            IsSelected = false;
         }
 
         internal void EnableBadge()
@@ -127,17 +130,24 @@ namespace NUIWHome
         }
         public delegate void ItemSelectedHandler(RotarySelectorItem item);
         public event ItemSelectedHandler OnItemSelected;
+        internal event ItemSelectedHandler OnItemUnselected;
 
         internal void SelectedItem()
         {
+            IsSelected = true;
             OnItemSelected(this);
             CallSelect();
         }
 
+        internal void UnselectedItem()
+        {
+            IsSelected = false;
+            OnItemUnselected(this);
+        }
+
         internal void ClickedItem()
         {
-            OnItemSelected(this);
-            CallSelect();
+            SelectedItem();
             CallClick();
         }
 
